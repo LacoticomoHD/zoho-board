@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Zoho-Umstieg Board · INTRO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: dunkles INTRO-Band (Schwarzblau → Petrol) mit Status-Pipeline, darunter Sammelbox für Ruven und die Punkte als Karten mit Stepper */
+:root{
+  --ink:#171d24; --ink2:#5c6b7a; --bg:#f3f3f3; --surface:#ffffff; --line:#dfe4e8;
+  --red:#ff3100; --red-soft:#ffe7df; --green:#56797b; --green-soft:#e3ecec; --blue-l:#becad4;
+  --band1:#141b23; --band2:#2d3e44; --band-ink:#ffffff; --band-muted:#b9cbcc;
+  --ok:#2f7a4f; --ok-soft:#dcefe3; --warn:#9a6200; --warn-soft:#fbefd6;
+  --f:"Inter",Arial,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ink:#eef1f4; --ink2:#a3b0bc; --bg:#0f1419; --surface:#171d24; --line:#2a343d;
+  --red:#ff5a2e; --red-soft:#3a1d14; --green:#8fb5b7; --green-soft:#1d2c2e; --blue-l:#4b5a68;
+  --band1:#0b0f14; --band2:#1c272e; --ok:#86d8a5; --ok-soft:#163323; --warn:#f0b75a; --warn-soft:#3a2b10; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.in{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+a{color:var(--green)}
+
+/* Band */
+.band{background:linear-gradient(135deg,var(--band1) 0%,var(--band2) 100%);color:var(--band-ink)}
+.band .in{padding-block:22px 26px;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.logo{font-weight:800;letter-spacing:.18em;font-size:15px;display:flex;align-items:center;gap:10px}
+.logo b{color:var(--red)}
+.logo span{font-weight:500;letter-spacing:.04em;color:var(--band-muted);font-size:13px;border-left:1px solid #ffffff33;padding-left:10px}
+.me{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--band-muted)}
+.me input{background:#ffffff14;border:1px solid #ffffff33;color:#fff;border-radius:6px;padding:7px 10px;width:190px}
+.me input::placeholder{color:#ffffff88}
+.me input.need{border-color:var(--red);box-shadow:0 0 0 2px #ff310055}
+h1{margin:0;font-size:clamp(26px,4vw,40px);line-height:1.1;font-weight:700;text-wrap:balance;max-width:24ch}
+h1 i{font-style:normal;color:var(--red)}
+.lead{margin:0;color:var(--band-muted);max-width:68ch}
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media(max-width:720px){.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stage{all:unset;cursor:pointer;background:#ffffff0f;border:1px solid #ffffff22;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;position:relative}
+.stage:hover{background:#ffffff1a}
+.stage.on{border-color:var(--red);background:#ff31001f}
+.stage .n{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.stage .l{font-size:13px;color:var(--band-muted);font-weight:500}
+.stage .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffff99;font-weight:600}
+.stage:focus-visible{outline:2px solid var(--red)}
+
+/* Main */
+main .in{padding-block:22px 60px;display:flex;flex-direction:column;gap:18px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar input,.bar select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 11px;min-width:0}
+.bar input[type=search]{flex:1 1 220px}
+.chk{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink2)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:14px;display:inline-flex;gap:6px;align-items:center}
+.btn:hover{border-color:var(--ink2)}
+.btn.pri{background:var(--red);border-color:var(--red);color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:13px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.panel h2{margin:0;font-size:18px;font-weight:700}
+.panel .sub{margin:0;color:var(--ink2);font-size:14px;max-width:80ch}
+.ruven{border-left:4px solid var(--red)}
+.ruven ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+.mailto{font-weight:600;user-select:all}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* Form */
+.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:820px){.form{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.form{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.w2{grid-column:span 2}.f.w4{grid-column:1/-1}
+@media(max-width:480px){.f.w2{grid-column:auto}}
+.f label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.f label em{color:var(--red);font-style:normal}
+.f input,.f select,.f textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 11px;width:100%}
+.f textarea{min-height:110px;resize:vertical}
+.drop{border:1.5px dashed var(--blue-l);border-radius:8px;padding:14px;text-align:center;color:var(--ink2);font-size:14px;cursor:pointer}
+.drop.over{border-color:var(--red);background:var(--red-soft)}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumb{position:relative;width:96px;height:72px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--bg)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.thumb button{position:absolute;top:2px;right:2px;border:0;border-radius:4px;background:#000a;color:#fff;font-size:12px;cursor:pointer;padding:0 6px}
+.err{color:var(--red);font-size:14px;font-weight:500}
+
+/* Cards */
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.prio-hoch{box-shadow:inset 4px 0 0 var(--red)}
+.ch{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.ch h3{margin:0;font-size:17px;font-weight:700;flex:1 1 300px;min-width:0;overflow-wrap:anywhere}
+.id{font-variant-numeric:tabular-nums;color:var(--ink2);font-weight:600;font-size:13px}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--bg);color:var(--ink2);white-space:nowrap}
+.tag.Fehler{background:var(--red-soft);color:var(--red)}
+.tag.Problem{background:var(--warn-soft);color:var(--warn)}
+.tag.Verbesserung{background:var(--green-soft);color:var(--green)}
+.tag.hoch{background:var(--red);color:#fff}
+.meta{font-size:13px;color:var(--ink2)}
+.desc{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;max-width:85ch}
+
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+@media(max-width:640px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.step{all:unset;cursor:pointer;padding:9px 12px;display:flex;gap:9px;align-items:flex-start;border-right:1px solid var(--line);min-width:0}
+.step:last-child{border-right:0}
+.step:hover{background:var(--bg)}
+.step .dot{flex:0 0 20px;height:20px;border-radius:50%;border:2px solid var(--blue-l);display:grid;place-items:center;font-size:12px;font-weight:700;color:transparent;margin-top:1px}
+.step.done .dot{background:var(--green);border-color:var(--green);color:#fff}
+.step.cur .dot{background:var(--red);border-color:var(--red);color:#fff}
+.step .t{font-size:13.5px;font-weight:600;line-height:1.25}
+.step .w{font-size:12px;color:var(--ink2);display:block;font-weight:400;overflow-wrap:anywhere}
+.step:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.confirm{background:var(--warn-soft);color:var(--ink);border-radius:8px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.verw{background:var(--bg);border-radius:8px;padding:8px 12px;font-size:14px;color:var(--ink2)}
+
+.cm{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.c{display:flex;flex-direction:column;gap:1px;background:var(--bg);border-radius:8px;padding:8px 12px;max-width:85ch}
+.c b{font-size:13px}.c b span{font-weight:400;color:var(--ink2)}
+.c p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.cadd{display:flex;gap:8px;align-items:flex-end}
+.cadd textarea{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-height:40px;resize:vertical}
+.foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.empty{text-align:center;color:var(--ink2);padding:40px 16px;background:var(--surface);border:1px dashed var(--line);border-radius:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;z-index:50;max-width:calc(100% - 32px)}
+.gate{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,var(--band1),var(--band2));padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.gate form{background:var(--surface);border-radius:12px;padding:26px;display:flex;flex-direction:column;gap:12px;width:min(420px,100%)}
+.gate h2{margin:0;font-size:22px}
+.gate p{margin:0;color:var(--ink2);font-size:14px}
+.lb{position:fixed;inset:0;background:#000d;display:grid;place-items:center;z-index:60;padding:20px;cursor:zoom-out}
+.lb img{max-width:100%;max-height:85vh;border-radius:6px}
+.lb .row{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%)}
+.lb a{color:#fff;background:#ffffff22;padding:7px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px}
+.hint{font-size:13px;color:var(--ink2)}
+.fz{font-size:12px;color:var(--ink2);text-align:center;padding-bottom:20px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+const SB_URL = "https://mjirwwbelxuchifuaugq.supabase.co";
+const SB_KEY = "sb_publishable_wWJmj9C-SR5pq6SXI84VFA_LMvGVCEf";
+const RUVEN = "ruven@bytesandbears.de";
+const BUILD = "1.0";
+const STAGES = [
+  {s:"aufgenommen", t:"Aufgenommen", hint:"Eingetragen, noch nicht im Team besprochen"},
+  {s:"abgestimmt", t:"Im Team abgestimmt", hint:"Im Meeting besprochen, geht an Ruven"},
+  {s:"gesendet", t:"An Ruven gesendet", hint:"Liegt bei Ruven (Bytes & Bears)"},
+  {s:"geloest", t:"Gelöst", hint:"In Zoho behoben, von uns geprüft"}
+];
+const AREAS = ["Leads","Kontakte","Firmen / Accounts","Deals / Pipeline","Aktivitäten & Anrufe","E-Mail & Vorlagen","Kalender & Termine","Berichte & Dashboards","Import / Datenmigration","Rechte & Benutzer","Telefonie / Aircall","Mobile App","Sonstiges"];
+const DEMO = /[?&]demo\b/.test(location.search);
+
+/* ---------- storage helpers ---------- */
+const ls = {
+  get(k){ try{ return localStorage.getItem(k) }catch(_){ return null } },
+  set(k,v){ try{ v==null?localStorage.removeItem(k):localStorage.setItem(k,v) }catch(_){} }
+};
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = iso => { try{ return new Date(iso).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}) }catch(_){ return "" } };
+const fmtD = iso => { try{ return new Date(iso).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}) }catch(_){ return "" } };
+
+/* ---------- API ---------- */
+let CODE = null;
+async function rpc(fn, args){
+  if (DEMO) return demo(fn, {p_code:CODE, ...args});
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({p_code:CODE, ...args})
+  });
+  const txt = await r.text();
+  let j = null; try{ j = JSON.parse(txt) }catch(_){}
+  if (!r.ok){ const m = (j && (j.message||j.hint)) || txt || r.statusText; const e = new Error(m); e.status=r.status; throw e; }
+  return j;
+}
+
+/* ---------- Demo backend (nur mit ?demo, für Vorschau/Tests) ---------- */
+const DB = {t:[], shots:{}, id:1, sid:1, cid:1};
+function demo(fn, a){
+  const now = new Date().toISOString();
+  if (a.p_code !== "demo") return Promise.reject(Object.assign(new Error("Falscher Team-Code"),{status:400}));
+  if (fn==="zb_list") return Promise.resolve(JSON.parse(JSON.stringify(DB.t)).reverse());
+  if (fn==="zb_add_ticket"){ const t={id:DB.id++,created_at:now,updated_at:now,author:a.p_author,kind:a.p_kind,area:a.p_area,priority:a.p_priority,title:a.p_title,description:a.p_description,status:"aufgenommen",status_log:[{s:"aufgenommen",by:a.p_author,at:now}],comments:[],shots:[]};
+    (a.p_shots||[]).forEach(d=>{const i=DB.sid++;DB.shots[i]=d;t.shots.push(i)}); DB.t.push(t); return Promise.resolve(t.id); }
+  if (fn==="zb_comment"){ const t=DB.t.find(x=>x.id===a.p_ticket); t.comments.push({id:DB.cid++,author:a.p_author,body:a.p_body,created_at:now}); return Promise.resolve(1); }
+  if (fn==="zb_add_shot"){ const t=DB.t.find(x=>x.id===a.p_ticket); const i=DB.sid++; DB.shots[i]=a.p_data; t.shots.push(i); return Promise.resolve(i); }
+  if (fn==="zb_set_status"){ let n=0; DB.t.forEach(t=>{ if(a.p_ids.includes(t.id)&&t.status!==a.p_status){t.status=a.p_status;t.status_log.push({s:a.p_status,by:a.p_by,at:now});n++} }); return Promise.resolve(n); }
+  if (fn==="zb_shot") return Promise.resolve(DB.shots[a.p_id]);
+}
+if (DEMO){
+  const d = (h)=>new Date(Date.now()-h*3600e3).toISOString();
+  DB.t = [
+    {id:1,created_at:d(50),updated_at:d(20),author:"Beispiel: Kollegin A",kind:"Fehler",area:"Import / Datenmigration",priority:"hoch",title:"Beispiel: Telefonnummern aus Salesforce kommen ohne Ländervorwahl an",description:"Beim Import der Kontakte fehlt bei allen Festnetznummern die +49.\nBetrifft ca. 1.200 Kontakte.",status:"abgestimmt",status_log:[{s:"aufgenommen",by:"Beispiel: Kollegin A",at:d(50)},{s:"abgestimmt",by:"Beispiel: Teamleitung",at:d(20)}],comments:[{id:1,author:"Beispiel: Kollege B",body:"Bei mir genauso, auch bei Mobilnummern.",created_at:d(30)}],shots:[]},
+    {id:2,created_at:d(30),updated_at:d(30),author:"Beispiel: Kollege C",kind:"Verbesserung",area:"Aktivitäten & Anrufe",priority:"mittel",title:"Beispiel: Ergebnis-Feld nach dem Anruf als Pflichtfeld",description:"Wie in Salesforce: ohne Ergebnis soll man den Anruf nicht speichern können.",status:"aufgenommen",status_log:[{s:"aufgenommen",by:"Beispiel: Kollege C",at:d(30)}],comments:[],shots:[]},
+    {id:3,created_at:d(90),updated_at:d(5),author:"Beispiel: Teamleitung",kind:"Problem",area:"E-Mail & Vorlagen",priority:"niedrig",title:"Beispiel: Signatur fehlt in Vorlagen-Mails",description:"",status:"geloest",status_log:[{s:"aufgenommen",by:"Beispiel: Teamleitung",at:d(90)},{s:"abgestimmt",by:"Beispiel: Teamleitung",at:d(70)},{s:"gesendet",by:"Beispiel: Teamleitung",at:d(60)},{s:"geloest",by:"Beispiel: Kollegin A",at:d(5)}],comments:[],shots:[]}
+  ]; DB.id=4; DB.cid=2;
+}
+
+/* ---------- state ---------- */
+const S = { tickets:[], loading:true, error:"", stage:"", q:"", kind:"", mine:false, showForm:false, formErr:"", draftShots:[], confirm:null, sending:false, mailPrepared:false, openCm:{} };
+let NAME = ls.get("zb_name") || "";
+const app = document.getElementById("app");
+
+function toast(m){ const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),2600); }
+function needName(){ const n=(document.getElementById("me")||{}).value; NAME=(n||NAME||"").trim(); if(NAME.length<2){ const el=document.getElementById("me"); if(el){el.classList.add("need");el.focus();} toast("Bitte oben zuerst deinen Namen eintragen"); return false;} ls.set("zb_name",NAME); return true; }
+
+/* ---------- gate ---------- */
+function gate(msg){
+  app.innerHTML = `<div class="gate"><form id="gf">
+    <div class="logo" style="color:var(--ink)">INTRO<b>.</b><span style="color:var(--ink2);border-color:var(--line)">Zoho-Umstieg</span></div>
+    <h2>Team-Code eingeben</h2>
+    <p>Das Board ist nur fürs INTRO-Team. Den Code bekommst du im INTRO-Team. Er wird in diesem Browser gespeichert.</p>
+    <div class="f"><label for="gc">Team-Code</label><input id="gc" autocomplete="off" required></div>
+    <div class="f"><label for="gn">Dein Name <em>*</em></label><input id="gn" value="${esc(NAME)}" autocomplete="name" required minlength="2" placeholder="Vor- und Nachname"></div>
+    ${msg?`<div class="err">${esc(msg)}</div>`:""}
+    <button class="btn pri" type="submit">Board öffnen</button>
+    ${DEMO?'<p class="hint">Vorschau-Modus: Code „demo“.</p>':""}
+  </form></div>`;
+  document.getElementById("gf").addEventListener("submit", async e=>{
+    e.preventDefault();
+    CODE = document.getElementById("gc").value.trim();
+    NAME = document.getElementById("gn").value.trim();
+    if (NAME.length<2) return gate("Bitte deinen Namen eintragen.");
+    try{ S.tickets = await rpc("zb_list",{}); ls.set("zb_code",CODE); ls.set("zb_name",NAME); S.loading=false; render(); poll(); }
+    catch(err){ CODE=null; gate(/Code/.test(err.message)?"Der Code stimmt nicht.":"Keine Verbindung: "+err.message); }
+  });
+}
+
+/* ---------- data ---------- */
+async function load(quiet){
+  try{ S.tickets = await rpc("zb_list",{}); S.error=""; }
+  catch(err){ if(/Code/.test(err.message)){ ls.set("zb_code",null); CODE=null; return gate("Der Team-Code wurde geändert. Bitte neu eingeben."); } S.error="Keine Verbindung zum Board ("+err.message+"). Es wird automatisch neu versucht."; }
+  S.loading=false; if(!quiet || !busy()) render();
+}
+function busy(){ const a=document.activeElement; return a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.value; }
+let pollT; function poll(){ clearInterval(pollT); pollT=setInterval(()=>{ if(document.visibilityState==="visible") load(true) },30000); }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && CODE) load(true) });
+
+/* ---------- render ---------- */
+function counts(){ const c={aufgenommen:0,abgestimmt:0,gesendet:0,geloest:0,verworfen:0}; S.tickets.forEach(t=>c[t.status]++); return c; }
+function filtered(){
+  const q=S.q.toLowerCase();
+  return S.tickets.filter(t=>{
+    if (S.stage ? t.status!==S.stage : t.status==="verworfen") return false;
+    if (S.kind && t.kind!==S.kind) return false;
+    if (S.mine && NAME && t.author.toLowerCase()!==NAME.toLowerCase() && !t.comments.some(c=>c.author.toLowerCase()===NAME.toLowerCase())) return false;
+    if (q && ![t.title,t.description,t.area,t.author,"#"+t.id,...t.comments.map(c=>c.body)].join(" ").toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=> STAGES.findIndex(x=>x.s===a.status)-STAGES.findIndex(x=>x.s===b.status) || ({hoch:0,mittel:1,niedrig:2}[a.priority]-{hoch:0,mittel:1,niedrig:2}[b.priority]) || (b.created_at>a.created_at?1:-1));
+}
+function lastBy(t,s){ const l=[...t.status_log].reverse().find(x=>x.s===s); return l; }
+
+function render(){
+  const c=counts(), list=filtered(), ready=S.tickets.filter(t=>t.status==="abgestimmt");
+  const keep = snapshotInputs();
+  app.innerHTML = `
+  <header class="band"><div class="in">
+    <div class="top">
+      <div class="logo">INTRO<b>.</b><span>Salesforce → Zoho</span></div>
+      <label class="me" for="me">Ich bin <input id="me" value="${esc(NAME)}" placeholder="Dein Name (Pflicht)" autocomplete="name"></label>
+    </div>
+    <h1>Fehler, Probleme und Ideen für den <i>Zoho</i>-Umstieg</h1>
+    <p class="lead">Alles, was euch in Zoho auffällt, kommt hier rein. Wir stimmen es im Team ab und schicken es gesammelt an Ruven von Bytes &amp; Bears. Gelöst wird es erst, wenn wir es in Zoho geprüft haben.</p>
+    <div class="pipe" role="group" aria-label="Nach Status filtern">
+      ${STAGES.map((st,i)=>`<button class="stage ${S.stage===st.s?"on":""}" data-stage="${st.s}" aria-pressed="${S.stage===st.s}">
+        <span class="k">Schritt ${i+1}</span><span class="n">${c[st.s]}</span><span class="l">${st.t}</span></button>`).join("")}
+    </div>
+  </div></header>
+  <main><div class="in">
+    ${S.error?`<div class="panel" style="border-color:var(--red)"><span class="err">${esc(S.error)}</span></div>`:""}
+    ${ready.length?ruvenPanel(ready):""}
+    <div class="bar">
+      <button class="btn pri" id="new">+ Neuen Punkt melden</button>
+      <input type="search" id="q" placeholder="Suchen: Titel, Bereich, Name, #Nummer" value="${esc(S.q)}" aria-label="Suchen">
+      <select id="kind" aria-label="Art"><option value="">Alle Arten</option>${["Fehler","Problem","Verbesserung"].map(k=>`<option ${S.kind===k?"selected":""}>${k}</option>`).join("")}</select>
+      <label class="chk"><input type="checkbox" id="mine" ${S.mine?"checked":""}> nur meine</label>
+      <button class="btn sm" id="vw" ${S.stage==="verworfen"?'style="border-color:var(--red)"':""}>Verworfen (${c.verworfen})</button>
+      ${S.stage?`<button class="btn sm" id="all">Alle offenen zeigen</button>`:""}
+    </div>
+    ${S.showForm?formHtml():""}
+    <div class="list">
+      ${S.loading?'<div class="empty">Board wird geladen …</div>':
+        list.length?list.map(card).join(""):
+        `<div class="empty">${S.tickets.length?"Kein Punkt passt zu diesem Filter.":"Noch keine Punkte. Klick auf <b>+ Neuen Punkt melden</b> und trag den ersten Fehler oder Wunsch ein."}</div>`}
+    </div>
+  </div></main>
+  <div class="fz">INTRO Business Contact · Zoho-Umstieg Board · v${BUILD} · aktualisiert sich alle 30 Sekunden</div>`;
+  restoreInputs(keep);
+  bind();
+}
+function ruvenPanel(ready){
+  return `<section class="panel ruven" aria-labelledby="rh">
+    <h2 id="rh">Bereit für Ruven: ${ready.length} abgestimmte${ready.length===1?"r Punkt":" Punkte"}</h2>
+    <p class="sub">Diese Punkte sind im Team abgestimmt. Öffne die Mail, prüf sie und schick sie ab. Danach markierst du sie hier als gesendet. Empfänger: <span class="mailto">${RUVEN}</span></p>
+    <ul>${ready.map(t=>`<li><b>#${t.id}</b> ${esc(t.title)} <span class="meta">· ${esc(t.kind)} · ${esc(t.area)}${t.shots.length?` · ${t.shots.length} Screenshot${t.shots.length>1?"s":""}`:""}</span></li>`).join("")}</ul>
+    <div class="row">
+      <a class="btn dark" id="mail" href="${mailHref(ready)}">Mail an Ruven öffnen</a>
+      <button class="btn" id="copy">Mailtext kopieren</button>
+      <button class="btn pri" id="sent" ${S.sending?"disabled":""}>Alle ${ready.length} als „An Ruven gesendet“ markieren</button>
+    </div>
+    ${ready.some(t=>t.shots.length)?'<p class="hint">Screenshots hängen nicht automatisch an. Öffne sie in der Karte, lade sie herunter und häng sie an die Mail.</p>':""}
+    ${S.mailPrepared?'<p class="hint">Wenn sich kein Mailprogramm geöffnet hat: Text ist kopiert, einfach in eine neue Mail an Ruven einfügen.</p>':""}
+  </section>`;
+}
+function mailText(ready){
+  const head = `Hallo Ruven,\n\nhier sind ${ready.length} im Team abgestimmte Punkte zu unserem Zoho-Umstieg. Bitte gib uns kurz Rückmeldung, wenn ein Punkt umgesetzt ist, dann prüfen wir ihn und haken ihn ab.\n\n`;
+  const body = ready.map(t=>{
+    const notes = t.comments.length ? "\nAnmerkungen aus dem Team:\n"+t.comments.map(c=>`  - ${c.author}: ${c.body.replace(/\n+/g," ")}`).join("\n") : "";
+    return `#${t.id} ${t.title}\nArt: ${t.kind} | Bereich: ${t.area} | Dringlichkeit: ${t.priority}\nGemeldet von ${t.author} am ${fmtD(t.created_at)}${t.description?`\n\n${t.description}`:""}${notes}${t.shots.length?`\nScreenshots: ${t.shots.length} im Anhang`:""}`;
+  }).join("\n\n----------------------------------------\n\n");
+  return head + body + `\n\nViele Grüße\n${NAME||"INTRO Team"}\nINTRO Business Contact GmbH`;
+}
+function mailHref(ready){
+  const subj = `Zoho-Umstieg INTRO: ${ready.length} abgestimmte Punkte (${ready.map(t=>"#"+t.id).join(", ")})`;
+  let body = mailText(ready);
+  if (body.length > 1800) body = "Hallo Ruven,\n\n[Bitte hier den Text aus dem Board einfügen – er ist schon in der Zwischenablage.]\n\nViele Grüße";
+  return `mailto:${RUVEN}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+}
+function formHtml(){
+  return `<section class="panel" aria-labelledby="fh"><h2 id="fh">Neuen Punkt melden</h2>
+  <form id="nf" class="form" novalidate>
+    <div class="f"><label for="n_author">Dein Name <em>*</em></label><input id="n_author" value="${esc(NAME)}" required minlength="2" autocomplete="name"></div>
+    <div class="f"><label for="n_kind">Art <em>*</em></label><select id="n_kind"><option>Fehler</option><option>Problem</option><option>Verbesserung</option></select></div>
+    <div class="f"><label for="n_area">Bereich in Zoho <em>*</em></label><select id="n_area">${AREAS.map(a=>`<option>${a}</option>`).join("")}</select></div>
+    <div class="f"><label for="n_prio">Dringlichkeit <em>*</em></label><select id="n_prio"><option value="hoch">hoch: blockiert die Arbeit</option><option value="mittel" selected>mittel: nervt, Umweg möglich</option><option value="niedrig">niedrig: wäre schön</option></select></div>
+    <div class="f w4"><label for="n_title">Kurz und klar: Was ist los? <em>*</em></label><input id="n_title" maxlength="160" required placeholder="z. B. Anruf-Ergebnis wird beim Speichern nicht übernommen"></div>
+    <div class="f w4"><label for="n_desc">Beschreibung</label><textarea id="n_desc" maxlength="8000" placeholder="Was hast du gemacht? Was ist passiert? Was hättest du erwartet? Wie war es in Salesforce?"></textarea></div>
+    <div class="f w4"><label>Screenshots (bis 5)</label>
+      <div class="drop" id="drop" tabindex="0" role="button">Bild hierher ziehen, mit Strg+V einfügen oder <u>Datei auswählen</u></div>
+      <input type="file" id="file" accept="image/*" multiple hidden>
+      <div class="thumbs" id="dthumbs">${S.draftShots.map((d,i)=>`<div class="thumb"><img src="${d}" alt="Screenshot ${i+1}"><button type="button" data-rm="${i}" aria-label="Entfernen">×</button></div>`).join("")}</div>
+    </div>
+    ${S.formErr?`<div class="f w4 err">${esc(S.formErr)}</div>`:""}
+    <div class="f w4"><div class="row"><button class="btn pri" type="submit" id="nsub">Punkt eintragen</button><button class="btn" type="button" id="ncancel">Abbrechen</button></div></div>
+  </form></section>`;
+}
+function card(t){
+  const curIdx = STAGES.findIndex(x=>x.s===t.status);
+  const cf = S.confirm && S.confirm.id===t.id ? S.confirm : null;
+  const open = S.openCm[t.id];
+  return `<article class="card prio-${t.priority}" id="t${t.id}">
+    <div class="ch"><span class="id">#${t.id}</span><h3>${esc(t.title)}</h3>
+      <span class="tag ${t.kind}">${t.kind}</span>${t.priority==="hoch"?'<span class="tag hoch">dringend</span>':`<span class="tag">${t.priority}</span>`}<span class="tag">${esc(t.area)}</span></div>
+    <div class="meta">Gemeldet von <b>${esc(t.author)}</b> am ${fmt(t.created_at)}</div>
+    ${t.description?`<p class="desc">${esc(t.description)}</p>`:""}
+    ${t.status==="verworfen"?`<div class="verw">Verworfen von ${esc((lastBy(t,"verworfen")||{}).by||"")} am ${fmt((lastBy(t,"verworfen")||{}).at)}. <button class="btn sm" data-st="aufgenommen" data-id="${t.id}">Wieder aufnehmen</button></div>`:
+    `<div class="steps" role="group" aria-label="Status von #${t.id}">
+      ${STAGES.map((st,i)=>{ const l=lastBy(t,st.s); const cls=i<curIdx?"done":i===curIdx?"cur":""; const reached = i<=curIdx;
+        return `<button class="step ${cls}" data-st="${st.s}" data-id="${t.id}" title="${esc(st.hint)}" aria-current="${i===curIdx?"step":"false"}">
+          <span class="dot">${i<curIdx?"✓":i+1}</span><span class="t">${st.t}<span class="w">${reached&&l?`${esc(l.by)}, ${fmt(l.at)}`:"anklicken zum Setzen"}</span></span></button>`;}).join("")}
+    </div>`}
+    ${cf?`<div class="confirm" role="alert">${esc(cf.text)}
+      <button class="btn sm pri" data-ok="${t.id}">Ja, setzen</button><button class="btn sm" data-no="1">Abbrechen</button></div>`:""}
+    ${t.shots.length?`<div class="thumbs" data-shots="${t.id}">${t.shots.map((s,i)=>`<div class="thumb"><img data-sid="${s}" alt="Screenshot ${i+1} zu #${t.id}" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></div>`).join("")}</div>`:""}
+    <div class="cm">
+      ${t.comments.map(c=>`<div class="c"><b>${esc(c.author)} <span>· ${fmt(c.created_at)}</span></b><p>${esc(c.body)}</p></div>`).join("")}
+      ${open?`<div class="cadd"><textarea id="ct${t.id}" placeholder="Deine Anmerkung, z. B. „Bei mir auch, im Bereich …“" aria-label="Anmerkung zu #${t.id}"></textarea><button class="btn dark" data-cm="${t.id}">Senden</button></div>`:""}
+      <div class="foot">
+        <div class="row">${!open?`<button class="btn sm" data-copen="${t.id}">Anmerkung schreiben${t.comments.length?` (${t.comments.length})`:""}</button>`:""}
+          <label class="btn sm" style="cursor:pointer">Screenshot ergänzen<input type="file" accept="image/*" data-addshot="${t.id}" hidden></label></div>
+        ${t.status!=="verworfen"&&t.status!=="geloest"?`<button class="btn sm" data-st="verworfen" data-id="${t.id}" style="color:var(--ink2)">Verwerfen</button>`:""}
+      </div>
+    </div>
+  </article>`;
+}
+
+/* keep typed text across re-render */
+function snapshotInputs(){ const o={}; app.querySelectorAll("input[id],textarea[id],select[id]").forEach(el=>{ if(el.type!=="file"&&el.type!=="checkbox") o[el.id]=el.value }); const a=document.activeElement; o.__focus=a&&a.id; return o; }
+function restoreInputs(o){ Object.entries(o).forEach(([k,v])=>{ if(k==="__focus")return; const el=document.getElementById(k); if(el&&k!=="q"&&k!=="me"&&k!=="kind") el.value=v; }); if(o.__focus){ const el=document.getElementById(o.__focus); if(el){ el.focus(); try{ const n=el.value.length; el.setSelectionRange&&el.setSelectionRange(n,n) }catch(_){} } } }
+
+/* ---------- images ---------- */
+function compress(file){
+  return new Promise((res,rej)=>{
+    if(!/^image\//.test(file.type)) return rej(new Error("Nur Bilder möglich"));
+    const fr=new FileReader(); fr.onerror=()=>rej(new Error("Datei nicht lesbar"));
+    fr.onload=()=>{ const img=new Image(); img.onerror=()=>rej(new Error("Bild nicht lesbar")); img.onload=()=>{
+      const m=1600, sc=Math.min(1,m/Math.max(img.width,img.height)); const c=document.createElement("canvas");
+      c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc); const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
+      let q=.85, d=c.toDataURL("image/jpeg",q); while(d.length>2000000&&q>.4){ q-=.15; d=c.toDataURL("image/jpeg",q) } res(d); }; img.src=fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+async function addDraft(files){
+  for (const f of files){ if(S.draftShots.length>=5){ toast("Maximal 5 Screenshots"); break; } try{ S.draftShots.push(await compress(f)) }catch(e){ toast(e.message) } }
+  render();
+}
+const shotCache={};
+async function loadShots(){
+  for (const img of app.querySelectorAll("img[data-sid]")){
+    const id=img.dataset.sid;
+    if(shotCache[id]){ img.src=shotCache[id]; continue; }
+    rpc("zb_shot",{p_id:+id}).then(d=>{ if(d){ shotCache[id]=d; img.src=d; } }).catch(()=>{});
+  }
+}
+function lightbox(src, name){
+  const d=document.createElement("div"); d.className="lb"; d.innerHTML=`<img src="${src}" alt="Screenshot groß"><div class="row"><a href="${src}" download="${esc(name)}.jpg">Herunterladen</a></div>`;
+  d.addEventListener("click",e=>{ if(e.target.tagName!=="A") d.remove() }); document.addEventListener("keydown",function k(e){ if(e.key==="Escape"){d.remove();document.removeEventListener("keydown",k)} }); document.body.appendChild(d);
+}
+
+/* ---------- actions ---------- */
+async function setStatus(ids, status){
+  if(!needName()) return;
+  try{ const n=await rpc("zb_set_status",{p_ids:ids,p_status:status,p_by:NAME}); S.confirm=null; await load(); toast(n?`${n} Punkt${n>1?"e":""} auf „${(STAGES.find(x=>x.s===status)||{t:"Verworfen"}).t}“ gesetzt`:"Status war schon gesetzt"); }
+  catch(e){ toast("Nicht gespeichert: "+e.message) }
+}
+function askStatus(id, status){
+  const t=S.tickets.find(x=>x.id===id); if(!t||t.status===status) return;
+  const st=STAGES.find(x=>x.s===status);
+  const txt = status==="verworfen" ? `#${id} verwerfen? Er verschwindet aus der Liste (unter „Verworfen“ weiter sichtbar).`
+    : status==="geloest" ? `#${id} als gelöst abhaken? Nur, wenn ihr es in Zoho geprüft habt.`
+    : status==="abgestimmt" ? `#${id} ist im Team abgestimmt? Dann landet er in der Sammlung für Ruven.`
+    : status==="gesendet" ? `#${id} ist an Ruven raus?`
+    : `#${id} zurück auf „${st.t}“ setzen?`;
+  S.confirm={id,status,text:txt}; render();
+}
+
+function bind(){
+  const $=id=>document.getElementById(id);
+  $("me").addEventListener("change",e=>{ NAME=e.target.value.trim(); ls.set("zb_name",NAME||null); e.target.classList.remove("need"); });
+  app.querySelectorAll("[data-stage]").forEach(b=>b.onclick=()=>{ S.stage = S.stage===b.dataset.stage?"":b.dataset.stage; render(); });
+  $("q").addEventListener("input",e=>{ S.q=e.target.value; const p=e.target.selectionStart; render(); const q=$("q"); q.focus(); q.setSelectionRange(p,p); });
+  $("kind").onchange=e=>{ S.kind=e.target.value; render(); };
+  $("mine").onchange=e=>{ if(e.target.checked && !needName()){ e.target.checked=false; return; } S.mine=e.target.checked; render(); };
+  $("vw").onclick=()=>{ S.stage = S.stage==="verworfen"?"":"verworfen"; render(); };
+  if($("all")) $("all").onclick=()=>{ S.stage=""; render(); };
+  $("new").onclick=()=>{ S.showForm=!S.showForm; S.formErr=""; render(); if(S.showForm) $("n_title").focus(); };
+  if($("mail")){
+    const ready=S.tickets.filter(t=>t.status==="abgestimmt");
+    $("mail").addEventListener("click",()=>{ copy(mailText(ready),true); S.mailPrepared=true; setTimeout(render,400); });
+    $("copy").onclick=()=>copy(mailText(ready));
+    $("sent").onclick=()=>{ if(!needName()) return; S.confirm=null; const ids=ready.map(t=>t.id);
+      const box=$("sent").parentElement; box.insertAdjacentHTML("afterend",`<div class="confirm" id="sc">Ist die Mail mit ${ids.length} Punkt${ids.length>1?"en":""} wirklich an Ruven raus? <button class="btn sm pri" id="scok">Ja, als gesendet markieren</button><button class="btn sm" id="scno">Abbrechen</button></div>`);
+      $("sent").disabled=true; $("scno").onclick=()=>render(); $("scok").onclick=()=>{ S.sending=true; S.mailPrepared=false; setStatus(ids,"gesendet").finally(()=>{S.sending=false;}); }; };
+  }
+  if(S.showForm){
+    const drop=$("drop"), file=$("file");
+    drop.onclick=()=>file.click(); drop.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();file.click()} };
+    file.onchange=()=>addDraft([...file.files]);
+    drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")}; drop.ondragleave=()=>drop.classList.remove("over");
+    drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");addDraft([...e.dataTransfer.files])};
+    app.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ S.draftShots.splice(+b.dataset.rm,1); render(); });
+    $("ncancel").onclick=()=>{ S.showForm=false; S.draftShots=[]; S.formErr=""; render(); };
+    $("nf").onsubmit=async e=>{
+      e.preventDefault();
+      const a=$("n_author").value.trim(), ti=$("n_title").value.trim();
+      if(a.length<2){ S.formErr="Bitte deinen Namen eintragen. Das ist Pflicht, damit wir bei Rückfragen wissen, wen wir fragen."; render(); $("n_author").focus(); return; }
+      if(ti.length<3){ S.formErr="Bitte kurz beschreiben, was los ist (mindestens 3 Zeichen)."; render(); $("n_title").focus(); return; }
+      NAME=a; ls.set("zb_name",NAME); $("nsub").disabled=true; $("nsub").textContent="Wird gespeichert …";
+      try{ const id=await rpc("zb_add_ticket",{p_author:a,p_kind:$("n_kind").value,p_area:$("n_area").value,p_priority:$("n_prio").value,p_title:ti,p_description:$("n_desc").value.trim(),p_shots:S.draftShots});
+        S.showForm=false; S.draftShots=[]; S.formErr=""; S.stage=""; app.querySelectorAll("#n_title,#n_desc").forEach(x=>x.value=""); await load(); toast(`Punkt #${id} eingetragen. Danke!`); const el=$("t"+id); el&&el.scrollIntoView({block:"center"}); }
+      catch(err){ S.formErr="Nicht gespeichert: "+err.message; render(); }
+    };
+  }
+  app.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ if(!needName()) return; askStatus(+b.dataset.id,b.dataset.st); });
+  app.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>setStatus([S.confirm.id],S.confirm.status));
+  app.querySelectorAll("[data-no]").forEach(b=>b.onclick=()=>{ S.confirm=null; render(); });
+  app.querySelectorAll("[data-copen]").forEach(b=>b.onclick=()=>{ S.openCm[b.dataset.copen]=1; render(); const t=$("ct"+b.dataset.copen); t&&t.focus(); });
+  app.querySelectorAll("[data-cm]").forEach(b=>b.onclick=async()=>{
+    if(!needName()) return; const id=+b.dataset.cm, ta=$("ct"+id), body=ta.value.trim(); if(!body){ ta.focus(); return; }
+    b.disabled=true; try{ await rpc("zb_comment",{p_ticket:id,p_author:NAME,p_body:body}); ta.value=""; delete S.openCm[id]; await load(); toast("Anmerkung gespeichert"); }catch(e){ b.disabled=false; toast("Nicht gespeichert: "+e.message) }
+  });
+  app.querySelectorAll("[data-addshot]").forEach(inp=>inp.onchange=async()=>{
+    if(!needName()){ inp.value=""; return; } const id=+inp.dataset.addshot;
+    try{ for(const f of inp.files){ const d=await compress(f); await rpc("zb_add_shot",{p_ticket:id,p_author:NAME,p_data:d}); } await load(); toast("Screenshot ergänzt"); }catch(e){ toast("Nicht gespeichert: "+e.message) }
+  });
+  app.querySelectorAll("img[data-sid]").forEach(img=>img.onclick=()=>{ if(shotCache[img.dataset.sid]) lightbox(shotCache[img.dataset.sid], "zoho-punkt-"+img.closest("[data-shots]").dataset.shots+"-"+img.dataset.sid); });
+  app.querySelectorAll("#dthumbs img").forEach(img=>img.onclick=()=>lightbox(img.src,"entwurf"));
+  loadShots();
+}
+document.addEventListener("paste",e=>{
+  if(!S.showForm) return; const fs=[...(e.clipboardData||{}).files||[]].filter(f=>/^image\//.test(f.type)); if(fs.length){ e.preventDefault(); addDraft(fs); }
+});
+function copy(txt, silent){
+  const done=()=>{ if(!silent) toast("Mailtext kopiert") };
+  try{ navigator.clipboard.writeText(txt).then(done,()=>fallback()) }catch(_){ fallback() }
+  function fallback(){ const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(_){ toast("Kopieren ging nicht") } ta.remove(); }
+}
+
+/* ---------- start ---------- */
+(function start(){
+  const h = decodeURIComponent((location.hash||"").replace(/^#code=/,"").replace(/^#/,""));
+  if (location.hash.startsWith("#code=")){ ls.set("zb_code",h); history.replaceState(null,"",location.pathname+location.search); }
+  CODE = ls.get("zb_code");
+  if (DEMO && !CODE) CODE = null;
+  if (!CODE || !NAME) return gate();
+  render(); load(); poll();
+})();
+</script>
+</body>
+</html>
