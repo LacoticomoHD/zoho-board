@@ -141,6 +141,11 @@ main .in{padding-block:22px 60px;display:flex;flex-direction:column;gap:18px}
 .lb .row{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%)}
 .lb a{color:#fff;background:#ffffff22;padding:7px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px}
 .hint{font-size:13px;color:var(--ink2)}
+.lnk{all:unset;cursor:pointer;color:var(--green);font-size:12px;font-weight:600;margin-left:6px}
+.lnk:hover{text-decoration:underline}
+.lnk:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.card .form{background:var(--bg);border-radius:8px;padding:12px}
+.card .form input,.card .form select,.card .form textarea{background:var(--surface)}
 .fz{font-size:12px;color:var(--ink2);text-align:center;padding-bottom:20px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -152,7 +157,7 @@ main .in{padding-block:22px 60px;display:flex;flex-direction:column;gap:18px}
 const SB_URL = "https://mjirwwbelxuchifuaugq.supabase.co";
 const SB_KEY = "sb_publishable_wWJmj9C-SR5pq6SXI84VFA_LMvGVCEf";
 const RUVEN = "ruven@bytesandbears.de";
-const BUILD = "1.1";
+const BUILD = "1.2";
 const STAGES = [
   {s:"aufgenommen", t:"Aufgenommen", hint:"Eingetragen, noch nicht im Team besprochen"},
   {s:"abgestimmt", t:"Im Team abgestimmt", hint:"Im Meeting besprochen, geht an Ruven"},
@@ -197,6 +202,8 @@ function demo(fn, a){
   if (fn==="zb_comment"){ const t=DB.t.find(x=>x.id===a.p_ticket); t.comments.push({id:DB.cid++,author:a.p_author,body:a.p_body,created_at:now}); return Promise.resolve(1); }
   if (fn==="zb_add_shot"){ const t=DB.t.find(x=>x.id===a.p_ticket); const i=DB.sid++; DB.shots[i]=a.p_data; t.shots.push(i); return Promise.resolve(i); }
   if (fn==="zb_set_status"){ let n=0; DB.t.forEach(t=>{ if(a.p_ids.includes(t.id)&&t.status!==a.p_status){t.status=a.p_status;t.status_log.push({s:a.p_status,by:a.p_by,at:now});n++} }); return Promise.resolve(n); }
+  if (fn==="zb_edit_ticket"){ const t=DB.t.find(x=>x.id===a.p_id); Object.assign(t,{kind:a.p_kind,area:a.p_area,priority:a.p_priority,title:a.p_title,description:a.p_description,edited_at:now,edited_by:a.p_by}); return Promise.resolve(1); }
+  if (fn==="zb_edit_comment"){ for(const t of DB.t){ const c=t.comments.find(x=>x.id===a.p_id); if(c){ c.body=a.p_body; c.edited_at=now; c.edited_by=a.p_by; } } return Promise.resolve(1); }
   if (fn==="zb_shot") return Promise.resolve(DB.shots[a.p_id]);
 }
 if (DEMO){
@@ -209,7 +216,7 @@ if (DEMO){
 }
 
 /* ---------- state ---------- */
-const S = { tickets:[], loading:true, error:"", stage:"", q:"", kind:"", mine:false, showForm:false, formErr:"", draftShots:[], confirm:null, sending:false, mailPrepared:false, openCm:{} };
+const S = { tickets:[], loading:true, error:"", stage:"", q:"", kind:"", mine:false, showForm:false, formErr:"", draftShots:[], confirm:null, sending:false, mailPrepared:false, openCm:{}, editT:null, editC:null, editErr:"" };
 let NAME = ls.get("zb_name") || "";
 const app = document.getElementById("app");
 
@@ -350,11 +357,12 @@ function card(t){
   const curIdx = STAGES.findIndex(x=>x.s===t.status);
   const cf = S.confirm && S.confirm.id===t.id ? S.confirm : null;
   const open = S.openCm[t.id];
+  const ed = S.editT===t.id;
   return `<article class="card prio-${t.priority}" id="t${t.id}">
-    <div class="ch"><span class="id">#${t.id}</span><h3>${esc(t.title)}</h3>
-      <span class="tag ${t.kind}">${t.kind}</span>${t.priority==="hoch"?'<span class="tag hoch">dringend</span>':`<span class="tag">${t.priority}</span>`}<span class="tag">${esc(t.area)}</span></div>
-    <div class="meta">Gemeldet von <b>${esc(t.author)}</b> am ${fmt(t.created_at)}</div>
-    ${t.description?`<p class="desc">${esc(t.description)}</p>`:""}
+    ${ed?`<div class="ch"><span class="id">#${t.id}</span><h3>Punkt bearbeiten</h3></div>`:`<div class="ch"><span class="id">#${t.id}</span><h3>${esc(t.title)}</h3>
+      <span class="tag ${t.kind}">${t.kind}</span>${t.priority==="hoch"?'<span class="tag hoch">dringend</span>':`<span class="tag">${t.priority}</span>`}<span class="tag">${esc(t.area)}</span></div>`}
+    <div class="meta">Gemeldet von <b>${esc(t.author)}</b> am ${fmt(t.created_at)}${t.edited_at?` · bearbeitet von <b>${esc(t.edited_by)}</b> am ${fmt(t.edited_at)}`:""}</div>
+    ${ed?editHtml(t):t.description?`<p class="desc">${esc(t.description)}</p>`:""}
     ${t.status==="verworfen"?`<div class="verw">Verworfen von ${esc((lastBy(t,"verworfen")||{}).by||"")} am ${fmt((lastBy(t,"verworfen")||{}).at)}. <button class="btn sm" data-st="aufgenommen" data-id="${t.id}">Wieder aufnehmen</button></div>`:
     `<div class="steps" role="group" aria-label="Status von #${t.id}">
       ${STAGES.map((st,i)=>{ const l=lastBy(t,st.s); const cls=i<curIdx?"done":i===curIdx?"cur":""; const reached = i<=curIdx;
@@ -365,15 +373,30 @@ function card(t){
       <button class="btn sm pri" data-ok="${t.id}">Ja, setzen</button><button class="btn sm" data-no="1">Abbrechen</button></div>`:""}
     ${t.shots.length?`<div class="thumbs" data-shots="${t.id}">${t.shots.map((s,i)=>`<div class="thumb"><img data-sid="${s}" alt="Screenshot ${i+1} zu #${t.id}" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></div>`).join("")}</div>`:""}
     <div class="cm">
-      ${t.comments.map(c=>`<div class="c"><b>${esc(c.author)} <span>· ${fmt(c.created_at)}</span></b><p>${esc(c.body)}</p></div>`).join("")}
+      ${t.comments.map(c=> S.editC===c.id
+        ? `<div class="c"><b>${esc(c.author)} <span>· ${fmt(c.created_at)}</span></b><div class="cadd"><textarea id="ce${c.id}" maxlength="4000" aria-label="Anmerkung bearbeiten">${esc(c.body)}</textarea><button class="btn dark" data-csave="${c.id}">Speichern</button><button class="btn" data-ccancel="1">Abbrechen</button></div></div>`
+        : `<div class="c"><b>${esc(c.author)} <span>· ${fmt(c.created_at)}${c.edited_at?` · bearbeitet${c.edited_by&&c.edited_by!==c.author?" von "+esc(c.edited_by):""} am ${fmt(c.edited_at)}`:""}</span><button class="lnk" data-cedit="${c.id}" aria-label="Anmerkung von ${esc(c.author)} bearbeiten">bearbeiten</button></b><p>${esc(c.body)}</p></div>`).join("")}
       ${open?`<div class="cadd"><textarea id="ct${t.id}" placeholder="Deine Anmerkung, z. B. „Bei mir auch, im Bereich …“" aria-label="Anmerkung zu #${t.id}"></textarea><button class="btn dark" data-cm="${t.id}">Senden</button></div>`:""}
       <div class="foot">
-        <div class="row">${!open?`<button class="btn sm" data-copen="${t.id}">Anmerkung schreiben${t.comments.length?` (${t.comments.length})`:""}</button>`:""}
+        <div class="row">${!ed?`<button class="btn sm" data-edit="${t.id}">Bearbeiten</button>`:""}${!open?`<button class="btn sm" data-copen="${t.id}">Anmerkung schreiben${t.comments.length?` (${t.comments.length})`:""}</button>`:""}
           <label class="btn sm" style="cursor:pointer">Screenshot ergänzen<input type="file" accept="image/*" data-addshot="${t.id}" hidden></label></div>
         ${t.status!=="verworfen"&&t.status!=="geloest"?`<button class="btn sm" data-st="verworfen" data-id="${t.id}" style="color:var(--ink2)">Verwerfen</button>`:""}
       </div>
     </div>
   </article>`;
+}
+
+function editHtml(t){
+  const areas = AREAS.includes(t.area)?AREAS:[t.area,...AREAS];
+  return `<form class="form" data-ef="${t.id}" novalidate>
+    <div class="f"><label for="e_kind${t.id}">Art</label><select id="e_kind${t.id}">${["Fehler","Problem","Verbesserung"].map(k=>`<option ${t.kind===k?"selected":""}>${k}</option>`).join("")}</select></div>
+    <div class="f"><label for="e_area${t.id}">Bereich in Zoho</label><select id="e_area${t.id}">${areas.map(a=>`<option ${t.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select></div>
+    <div class="f w2"><label for="e_prio${t.id}">Dringlichkeit</label><select id="e_prio${t.id}">${[["hoch","hoch: blockiert die Arbeit"],["mittel","mittel: nervt, Umweg möglich"],["niedrig","niedrig: wäre schön"]].map(([v,l])=>`<option value="${v}" ${t.priority===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div class="f w4"><label for="e_title${t.id}">Kurz und klar: Was ist los? <em>*</em></label><input id="e_title${t.id}" maxlength="160" value="${esc(t.title)}"></div>
+    <div class="f w4"><label for="e_desc${t.id}">Beschreibung</label><textarea id="e_desc${t.id}" maxlength="8000">${esc(t.description)}</textarea></div>
+    ${S.editErr?`<div class="f w4 err">${esc(S.editErr)}</div>`:""}
+    <div class="f w4"><div class="row"><button class="btn pri" type="submit">Änderungen speichern</button><button class="btn" type="button" data-ecancel="1">Abbrechen</button><span class="hint">Die alte Fassung bleibt im Hintergrund gespeichert.</span></div></div>
+  </form>`;
 }
 
 /* keep typed text across re-render */
@@ -470,6 +493,22 @@ function bind(){
   app.querySelectorAll("[data-cm]").forEach(b=>b.onclick=async()=>{
     if(!needName()) return; const id=+b.dataset.cm, ta=$("ct"+id), body=ta.value.trim(); if(!body){ ta.focus(); return; }
     b.disabled=true; try{ await rpc("zb_comment",{p_ticket:id,p_author:NAME,p_body:body}); ta.value=""; delete S.openCm[id]; await load(); toast("Anmerkung gespeichert"); }catch(e){ b.disabled=false; toast("Nicht gespeichert: "+e.message) }
+  });
+  app.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ if(!needName()) return; S.editT=+b.dataset.edit; S.editErr=""; S.confirm=null; render(); const el=$("e_title"+S.editT); el&&el.focus(); });
+  app.querySelectorAll("[data-ecancel]").forEach(b=>b.onclick=()=>{ S.editT=null; S.editErr=""; render(); });
+  app.querySelectorAll("form[data-ef]").forEach(f=>f.onsubmit=async e=>{
+    e.preventDefault(); if(!needName()) return; const id=+f.dataset.ef, ti=$("e_title"+id).value.trim();
+    if(ti.length<3){ S.editErr="Bitte kurz beschreiben, was los ist (mindestens 3 Zeichen)."; render(); $("e_title"+id).focus(); return; }
+    const btn=f.querySelector("button[type=submit]"); btn.disabled=true; btn.textContent="Wird gespeichert …";
+    try{ const n=await rpc("zb_edit_ticket",{p_id:id,p_by:NAME,p_kind:$("e_kind"+id).value,p_area:$("e_area"+id).value,p_priority:$("e_prio"+id).value,p_title:ti,p_description:$("e_desc"+id).value.trim()});
+      S.editT=null; S.editErr=""; await load(); toast(n?`#${id} gespeichert`:"Nichts geändert"); }
+    catch(err){ S.editErr="Nicht gespeichert: "+err.message; render(); }
+  });
+  app.querySelectorAll("[data-cedit]").forEach(b=>b.onclick=()=>{ if(!needName()) return; S.editC=+b.dataset.cedit; render(); const ta=$("ce"+S.editC); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); } });
+  app.querySelectorAll("[data-ccancel]").forEach(b=>b.onclick=()=>{ S.editC=null; render(); });
+  app.querySelectorAll("[data-csave]").forEach(b=>b.onclick=async()=>{
+    if(!needName()) return; const id=+b.dataset.csave, ta=$("ce"+id), body=ta.value.trim(); if(!body){ ta.focus(); return; }
+    b.disabled=true; try{ const n=await rpc("zb_edit_comment",{p_id:id,p_by:NAME,p_body:body}); S.editC=null; await load(); toast(n?"Anmerkung gespeichert":"Nichts geändert"); }catch(e){ b.disabled=false; toast("Nicht gespeichert: "+e.message) }
   });
   app.querySelectorAll("[data-addshot]").forEach(inp=>inp.onchange=async()=>{
     if(!needName()){ inp.value=""; return; } const id=+inp.dataset.addshot;

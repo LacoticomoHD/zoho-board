@@ -121,3 +121,53 @@ end $$;
 revoke all on function zoho_board.ok(text) from public, anon, authenticated;
 revoke all on function public.zb_list(text), public.zb_add_ticket(text,text,text,text,text,text,text,text[]), public.zb_add_shot(text,bigint,text,text), public.zb_comment(text,bigint,text,text), public.zb_set_status(text,bigint[],text,text), public.zb_shot(text,bigint) from public;
 grant execute on function public.zb_list(text), public.zb_add_ticket(text,text,text,text,text,text,text,text[]), public.zb_add_shot(text,bigint,text,text), public.zb_comment(text,bigint,text,text), public.zb_set_status(text,bigint[],text,text), public.zb_shot(text,bigint) to anon, authenticated;
+
+-- ===== Erweiterung v1.2: Punkte und Anmerkungen bearbeiten (alte Fassung bleibt im edit_log) =====
+alter table zoho_board.tickets add column if not exists edited_at timestamptz, add column if not exists edited_by text, add column if not exists edit_log jsonb not null default '[]'::jsonb;
+alter table zoho_board.comments add column if not exists edited_at timestamptz, add column if not exists edited_by text, add column if not exists edit_log jsonb not null default '[]'::jsonb;
+
+create or replace function public.zb_list(p_code text) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+begin
+  perform zoho_board.ok(p_code);
+  return coalesce((select jsonb_agg(jsonb_build_object(
+    'id',t.id,'created_at',t.created_at,'updated_at',t.updated_at,'author',t.author,'kind',t.kind,'area',t.area,
+    'priority',t.priority,'title',t.title,'description',t.description,'status',t.status,'status_log',t.status_log,
+    'edited_at',t.edited_at,'edited_by',t.edited_by,
+    'comments',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'author',c.author,'body',c.body,'created_at',c.created_at,'edited_at',c.edited_at,'edited_by',c.edited_by) order by c.created_at) from zoho_board.comments c where c.ticket_id=t.id),'[]'::jsonb),
+    'shots',coalesce((select jsonb_agg(s.id order by s.id) from zoho_board.shots s where s.ticket_id=t.id),'[]'::jsonb)
+  ) order by t.created_at desc) from zoho_board.tickets t),'[]'::jsonb);
+end $$;
+
+create or replace function public.zb_edit_ticket(p_code text, p_id bigint, p_by text, p_kind text, p_area text, p_priority text, p_title text, p_description text)
+returns int language plpgsql security definer set search_path = '' as $$
+declare n int;
+begin
+  perform zoho_board.ok(p_code);
+  if length(trim(coalesce(p_by,''))) < 2 then raise exception 'Name fehlt'; end if;
+  update zoho_board.tickets t set
+    edit_log = t.edit_log || jsonb_build_array(jsonb_build_object('by',trim(p_by),'at',now(),'old',jsonb_build_object('kind',t.kind,'area',t.area,'priority',t.priority,'title',t.title,'description',t.description))),
+    kind=p_kind, area=coalesce(p_area,''), priority=p_priority, title=trim(p_title), description=coalesce(p_description,''),
+    edited_at=now(), edited_by=trim(p_by), updated_at=now()
+  where t.id=p_id and (t.kind,t.area,t.priority,t.title,t.description) is distinct from (p_kind,coalesce(p_area,''),p_priority,trim(p_title),coalesce(p_description,''));
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+create or replace function public.zb_edit_comment(p_code text, p_id bigint, p_by text, p_body text)
+returns int language plpgsql security definer set search_path = '' as $$
+declare n int;
+begin
+  perform zoho_board.ok(p_code);
+  if length(trim(coalesce(p_by,''))) < 2 then raise exception 'Name fehlt'; end if;
+  update zoho_board.comments c set
+    edit_log = c.edit_log || jsonb_build_array(jsonb_build_object('by',trim(p_by),'at',now(),'old',c.body)),
+    body=trim(p_body), edited_at=now(), edited_by=trim(p_by)
+  where c.id=p_id and c.body is distinct from trim(p_body);
+  get diagnostics n = row_count;
+  if n>0 then update zoho_board.tickets set updated_at=now() where id=(select ticket_id from zoho_board.comments where id=p_id); end if;
+  return n;
+end $$;
+
+revoke all on function public.zb_edit_ticket(text,bigint,text,text,text,text,text,text), public.zb_edit_comment(text,bigint,text,text) from public;
+grant execute on function public.zb_edit_ticket(text,bigint,text,text,text,text,text,text), public.zb_edit_comment(text,bigint,text,text) to anon, authenticated;
