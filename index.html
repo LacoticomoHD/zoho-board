@@ -152,7 +152,7 @@ main .in{padding-block:22px 60px;display:flex;flex-direction:column;gap:18px}
 const SB_URL = "https://mjirwwbelxuchifuaugq.supabase.co";
 const SB_KEY = "sb_publishable_wWJmj9C-SR5pq6SXI84VFA_LMvGVCEf";
 const RUVEN = "ruven@bytesandbears.de";
-const BUILD = "1.0";
+const BUILD = "1.1";
 const STAGES = [
   {s:"aufgenommen", t:"Aufgenommen", hint:"Eingetragen, noch nicht im Team besprochen"},
   {s:"abgestimmt", t:"Im Team abgestimmt", hint:"Im Meeting besprochen, geht an Ruven"},
@@ -258,12 +258,12 @@ function filtered(){
     if (S.mine && NAME && t.author.toLowerCase()!==NAME.toLowerCase() && !t.comments.some(c=>c.author.toLowerCase()===NAME.toLowerCase())) return false;
     if (q && ![t.title,t.description,t.area,t.author,"#"+t.id,...t.comments.map(c=>c.body)].join(" ").toLowerCase().includes(q)) return false;
     return true;
-  }).sort((a,b)=> STAGES.findIndex(x=>x.s===a.status)-STAGES.findIndex(x=>x.s===b.status) || ({hoch:0,mittel:1,niedrig:2}[a.priority]-{hoch:0,mittel:1,niedrig:2}[b.priority]) || (b.created_at>a.created_at?1:-1));
+  }).sort((a,b)=> b.id-a.id);
 }
 function lastBy(t,s){ const l=[...t.status_log].reverse().find(x=>x.s===s); return l; }
 
 function render(){
-  const c=counts(), list=filtered(), ready=S.tickets.filter(t=>t.status==="abgestimmt");
+  const c=counts(), list=filtered(), ready=S.tickets.filter(t=>t.status==="abgestimmt").sort((a,b)=>b.id-a.id);
   const keep = snapshotInputs();
   app.innerHTML = `
   <header class="band"><div class="in">
